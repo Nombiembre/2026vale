@@ -1,0 +1,10 @@
+---
+interface Props {
+    sticker: string;
+}
+
+const { sticker } = Astro.props;
+const src = `/public/images/diary/generic/stickers/${sticker}.avif`;
+---
+
+<img src={src} alt="Sticker" class="not-prose w-full h-full object-cover rounded-none max-w-1/4 text-left" />
