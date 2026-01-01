@@ -1,0 +1,15 @@
+---
+interface Props {
+    text?: string;
+}
+
+const { text } = Astro.props;
+---
+<footer class="text-center mt-auto text-ink-muted pb-2 ">
+    <span>{text}</span>
+    <div class="text-center block border border-t-border border-transparent container">
+        <p class="text-base italic text-ink-muted">
+            Esta página siempre existirá. Testimonio de lo que fue, de lo que es y de aquello que permanece.
+        </p>
+    </div>
+</footer>

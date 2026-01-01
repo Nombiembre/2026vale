@@ -1,0 +1,49 @@
+---
+import "../styles/global.css";
+import Head from "~/components/meta/Head.astro";
+import Header from "~/components/meta/Header.astro";
+import Footer from "~/components/meta/Footer.astro";
+import Title from "~/components/common/Title.astro";
+
+interface Props {
+	title: string;
+	subtitle?: string;
+	noTitle?: boolean;
+	footerText?: string;
+}
+
+const { title, subtitle, noTitle, footerText } = Astro.props;
+---
+
+<!doctype html>
+<html lang="es">
+	<Head title={title} />
+	<body class="flex flex-col min-h-screen bg-paper">
+		<Header />
+		<main class="container">
+			{
+				noTitle ? null : (
+					<div class="mb-10 text-center">
+						<Title title={title} variant="primary" />
+						{subtitle && (
+							<span class="text-sm md:text-lg text-ink-muted italic">
+								{subtitle}
+							</span>
+						)}
+					</div>
+				)
+			}
+			<slot />
+		</main>
+		<Footer text={footerText} />
+	</body>
+</html>
+
+<style>
+	html,
+	body {
+		margin: 0;
+		width: 100%;
+		height: 100%;
+	}
+</style>

@@ -1,0 +1,34 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "~/layouts/Layout.astro";
+import RenderDiary from "~/components/collections/RenderDiary.tsx";
+import Test from "~/components/collections/Test.tsx";
+import YearFilter from "~/components/collections/YearFilter.astro";
+
+const capsules = (await getCollection("diary"))
+  .filter(({ id }) => !id.includes("nancy"))
+  .map((item) => ({
+    id: item.id,
+    date: item.data.date,
+    cover: item.data.cover,
+  }))
+  .sort((a, b) => {
+    const da = a.date;
+    const db = b.date;
+
+    if (da.getUTCFullYear() !== db.getUTCFullYear()) {
+      return db.getUTCFullYear() - da.getUTCFullYear();
+    }
+    if (da.getUTCMonth() !== db.getUTCMonth()) {
+      return db.getUTCMonth() - da.getUTCMonth();
+    }
+    return da.getUTCDate() - db.getUTCDate();
+  });
+---
+
+<Layout title="Capsules of Echoes" subtitle="Una crónica de momentos preservados en el tiempo. Cada dia, una flor olvidada entre las páginas de la memoria.">
+  <div class="space-y-6">
+    <YearFilter years={['all', '2025', '2026']} />
+    <Test collection={capsules} client:load/>
+  </div>
+</Layout>

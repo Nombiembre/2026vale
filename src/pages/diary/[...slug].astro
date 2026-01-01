@@ -1,0 +1,75 @@
+---
+import { getEntry, render, type CollectionEntry } from "astro:content";
+import Prose from "~/components/common/Prose.astro";
+import Title from "~/components/common/Title.astro";
+import Layout from "~/layouts/Layout.astro";
+import displayDate from "~/utils/displayTime";
+
+interface Props {
+  post: CollectionEntry<"diary">;
+  theme?: "love";
+}
+
+const { slug } = Astro.params;
+if (slug === undefined) {
+  return Astro.redirect("/404");
+}
+const post = await getEntry("diary", slug);
+if (post === undefined) {
+  return Astro.redirect("/404");
+}
+
+const { Content } = await render(post);
+const transitionName = `post-img-${post.id}`;
+const { date, cover, theme, text } = post.data;
+const dateString = displayDate(date, { day: "numeric", month: "long" });
+---
+
+<Layout title={dateString} noTitle footerText={text}>
+  <div class="container space-y-4 pb-20">
+    <Title title={dateString} variant="small" />
+    <div
+      class="aspect-video max-w-2xl mb-10 relative mx-auto overflow-hidden shadow-lg border-4 border-muted/30"
+    >
+      {
+        cover ? (
+          <img
+            data-transition={transitionName}
+            src={cover}
+            class="w-full h-full object-cover "
+          />
+        ) : (
+          <div class="bg-black w-full h-full group-hover:bg-zinc-900  group-focus-within:bg-zinc-900 transition-all duration-300 " />
+        )
+      }
+    </div>
+
+    <Prose theme={theme}>
+      <Content />
+    </Prose>
+  </div>
+</Layout>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+    gsap.registerPlugin(ScrollTrigger);
+    const scrollContent = document.querySelector(
+      ".scroll-content",
+    ) as HTMLDivElement;
+    const progressBar = document.querySelector(
+      ".proggress-bar",
+    ) as HTMLDivElement;
+
+    gsap.to(progressBar, {
+      width: "100%",
+      scrollTrigger: {
+        trigger: scrollContent,
+        scrub: true,
+        start: "top 60%",
+        end: "bottom 96%",
+        toggleActions: "play reverse none none",
+      },
+  });
+</script>

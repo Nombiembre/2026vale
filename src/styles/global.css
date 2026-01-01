@@ -1,0 +1,98 @@
+@import "tailwindcss";
+@plugin '@tailwindcss/typography';
+
+/* =========================
+   ROOT – PALETTE & TOKENS
+   ========================= */
+
+
+
+:root {
+  /* Paper */
+  --paper: #f6f1e7;       /* aged parchment */
+  --paper-soft: #fbf8f2;  /* lighter areas */
+
+  /* Ink */
+  --ink: #2f2a24;         /* main text */
+  --ink-muted: #5c554b;   /* secondary text */
+
+  /* Accents */
+  --primary: oklch(0.48 0.1 155);
+  --accent: #2c3e73;      /* deep manuscript blue */
+  --accent-soft: #4b5f9e;
+  --accent-warm: #9e3a2f; /* muted red */
+  --accent-gold: #b89b5e; /* ornament gold */
+
+  --muted: oklch(0.75 0.06 75);
+  --muted-foreground: oklch(0.45 0.02 50);
+
+  /* Lines */
+  --border: #ddd2bd;
+
+  /* Layout */
+  --radius: 6px;
+}
+
+@theme {
+  --color-background: var(--paper);
+  --color-primary: var(--primary);
+  --color-primary-bg: color-mix(in oklab, var(--color-primary) 10%, transparent);
+  --color-accent-gold: var(--accent-gold);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  
+  --color-border: var(--border);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  
+  --color-prose: color-mix(in oklab, var(--ink) 90%, transparent);
+      
+}
+
+
+@layer base {
+  body {
+    font-family: "Crimson Pro", Georgia, Garamond, serif;
+    background-color: var(--paper);
+    color: var(--ink);
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+
+@layer utilities {
+  .ornament {
+    color: var(--accent-gold);
+    font-weight: 300;
+    letter-spacing: 0.2em;
+  }
+
+  .paper-texture {
+    background-image:
+      radial-gradient(circle at 20% 30%, #ffffff55 0%, transparent 60%),
+      radial-gradient(circle at 80% 60%, #ffffff44 0%, transparent 55%);
+  }
+
+  .container {
+  --max_width: 1040px;
+  --padding: 1rem;
+
+  width: min(100% - var(--padding) * 2, var(--max_width));
+  margin-inline: auto;
+}
+
+  .primary-btn {
+    @apply border border-border px-3 md:px-5 py-1 md:py-2 text-center me-1 md:me-2 transition-all duration-300 capitalize text-base outline-none hover:text-primary hover:border-primary focus-visible:text-primary focus-visible:border-primary;
+  }
+}
+
+

@@ -1,0 +1,76 @@
+---
+const path = `/${Astro.url.pathname.split("/")[1]}`;
+
+export const NAVIGATION = [
+    { name: "Home", href: "/" },
+    { name: "✦", href: "separator" },
+    {
+        name: "Capsules of Echoes",
+        href: "/diary",
+    },
+    { name: "✦", href: "separator" },
+    {
+        name: "Transmission",
+        href: "/transmission",
+    },
+    { name: "✦", href: "separator" },
+    // {
+    //   name: 'Signal Home',
+    //   href: '/signal',
+    // },
+    // {
+    //   name: 'Daily Log',
+    //   href: '/daily-log'
+    // },
+    {
+        name: "The Observatory",
+        href: "/observatory",
+    },
+    { name: "✦", href: "separator" },
+    {
+        name: "Signal Home",
+        href: "/signal",
+    },
+];
+---
+
+<header
+    class="sticky top-0 z-50 bg-background/80 backdrop-blur-sm border-b border-border transition-all duration-300 mb-6"
+>
+    <nav class="mx-auto px-6 py-5">
+        <ul class="flex items-center flex-wrap justify-center gap-1 md:gap-6">
+            {
+                NAVIGATION.map(({ name, href }) => {
+                    if (href === "separator") {
+                        return (
+                            <li>
+                                <span class="text-[oklch(0.45_0.02_50)]/40 mx-2 text-xs">
+                                    {name}
+                                </span>
+                            </li>
+                        );
+                    }
+                    return (
+                        <li>
+                            <a
+                                href={href}
+                                transition:name={`nav-item-${href}`}
+                                class={`transition-all group relative hover:text-primary ${href === path && "text-primary "}`}
+                            >
+                                {name}
+                                <div
+                                    class={`absolute bg-primary -bottom-1 left-0 h-px transition-all duration-300 group-hover:w-full  ${href === path ? "w-full" : "w-0"}`}
+                                />
+                            </a>
+                        </li>
+                    );
+                })
+            }
+        </ul>
+    </nav>
+</header>
+
+<style>
+    a {
+    }
+</style>
