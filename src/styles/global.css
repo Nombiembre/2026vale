@@ -83,7 +83,7 @@
   }
 
   .container {
-  --max_width: 1040px;
+  --max_width: 1140px;
   --padding: 1rem;
 
   width: min(100% - var(--padding) * 2, var(--max_width));
@@ -92,6 +92,14 @@
 
   .primary-btn {
     @apply border border-border px-3 md:px-5 py-1 md:py-2 text-center me-1 md:me-2 transition-all duration-300 capitalize text-base outline-none hover:text-primary hover:border-primary focus-visible:text-primary focus-visible:border-primary;
+  }
+
+  .button-filter {
+    @apply border border-border px-3 md:px-5 py-1 md:py-2 text-center me-1 md:me-2 transition-all duration-300 capitalize text-base outline-none hover:text-primary hover:border-primary focus-visible:text-primary focus-visible:border-primary;
+  }
+
+  .selectedfilter{
+    @apply border-primary focus-visible:text-primary bg-primary-bg text-primary focus-visible:opacity-50;
   }
 }
 

@@ -18,7 +18,7 @@ const { years } = Astro.props;
     {
       years.map((y) => {
         return (
-          <button value={y} class:list={[{ selected: year === y }]} type="button">
+          <button value={y} class="button-filter" class:list={[{ selectedfilter: year === y }]} type="button">
           {y}
         </button>
       );
@@ -27,26 +27,15 @@ const { years } = Astro.props;
   </div>
 </div>
 
-<style>
-  @import "tailwindcss/theme" theme(reference);
-  @import "../../styles/global.css" reference;
-  button {
-    @apply border border-border px-3 md:px-5 py-1 md:py-2 text-center me-1 md:me-2 transition-all duration-300 capitalize text-base outline-none hover:text-primary hover:border-primary focus-visible:text-primary focus-visible:border-primary;
-  }
-
-  .selected {
-    @apply border-primary focus-visible:text-primary bg-primary-bg text-primary focus-visible:opacity-50;
-  }
-</style>
 <script>
   import type { yearType } from "~/utils/filterStore";
-  import { $yearStore } from "~/utils/filterStore";
+  import { $monthStore, $yearStore } from "~/utils/filterStore";
 
   // document.addEventListener('astro:page-load', () => {
 
 
   const btns = document.querySelectorAll('#yearFilter button') as NodeListOf<HTMLButtonElement>;
-  const defaultBtn = document.querySelector('#yearFilter .selected') as HTMLButtonElement;
+  const defaultBtn = document.querySelector('#yearFilter .selectedfilter') as HTMLButtonElement;
   let prev = defaultBtn;
   const url = new URL(window.location.href);
   let year = url.searchParams.get('year') as yearType;
@@ -57,12 +46,14 @@ const { years } = Astro.props;
 
   btns.forEach((btn) => {
     btn.addEventListener('click', () => {
-      prev.classList.remove('selected');
-      btn.classList.add('selected');
+      prev.classList.remove('selectedfilter');
+      btn.classList.add('selectedfilter');
       prev = btn;
       const selectedYear = btn.value as yearType;
       setYear(selectedYear);
       const url = new URL(window.location.href);
+      url.searchParams.delete("month");
+      $monthStore.set('all')
       if (selectedYear !== 'all') {
         url.searchParams.set('year', selectedYear);
         window.history.pushState({}, '', url);

@@ -1,9 +1,9 @@
 ---
 import { getCollection } from "astro:content";
 import Layout from "~/layouts/Layout.astro";
-import RenderDiary from "~/components/collections/RenderDiary.tsx";
-import Test from "~/components/collections/Test.tsx";
+import DiaryRender from "~/components/collections/DiaryRender";
 import YearFilter from "~/components/collections/YearFilter.astro";
+import MonthFilter from "~/components/collections/MonthFilter";
 
 const capsules = (await getCollection("diary"))
   .filter(({ id }) => !id.includes("nancy"))
@@ -16,20 +16,40 @@ const capsules = (await getCollection("diary"))
   .sort((a, b) => {
     const da = a.date;
     const db = b.date;
-
-    if (da.getUTCFullYear() !== db.getUTCFullYear()) {
-      return db.getUTCFullYear() - da.getUTCFullYear();
-    }
-    if (da.getUTCMonth() !== db.getUTCMonth()) {
-      return db.getUTCMonth() - da.getUTCMonth();
-    }
+    if (da.getUTCFullYear() !== db.getUTCFullYear()) return db.getUTCFullYear() - da.getUTCFullYear();
+    if (da.getUTCMonth() !== db.getUTCMonth()) return db.getUTCMonth() - da.getUTCMonth();
     return da.getUTCDate() - db.getUTCDate();
   });
+
+// Calcular años y meses disponibles
+const yearSet = new Set<string>();
+const monthsByYear: Record<string, number[]> = {};
+
+for (const item of capsules) {
+  const year = String(item.date.getUTCFullYear());
+  const month = item.date.getUTCMonth();
+  yearSet.add(year);
+  if (!monthsByYear[year]) monthsByYear[year] = [];
+  if (!monthsByYear[year].includes(month)) monthsByYear[year].push(month);
+}
+
+// Ordenar meses de cada año descendente
+for (const year in monthsByYear) {
+  monthsByYear[year].sort((a, b) => a - b);
+}
+
+const years = ["all", ...Array.from(yearSet).sort((a, b) => Number(a) - Number(b))];
 ---
 
-<Layout title="Capsules of Echoes" subtitle="Una crónica de momentos preservados en el tiempo. Cada dia, una flor olvidada entre las páginas de la memoria.">
+<Layout
+  title="Capsules of Echoes"
+  subtitle="Una crónica de momentos preservados en el tiempo. Cada dia, una flor olvidada entre las páginas de la memoria."
+>
   <div class="space-y-6">
-    <YearFilter years={['all', '2025', '2026']} />
-    <Test collection={capsules} client:load/>
+    <div class="flex-col  md:items-center flex-wrap gap-y-3 gap-6 items-center flex">
+       <YearFilter years={years} />
+       <MonthFilter monthsByYear={monthsByYear} client:load />
+    </div>
+    <DiaryRender collection={capsules} client:load />
   </div>
 </Layout>
