@@ -9,6 +9,7 @@ const diary = defineCollection({
         cover: z.string().optional(),
         text: z.string().optional(),
         theme: z.enum(["love"]).optional(),
+        align: z.enum(['b', 'b-l', 'b-r', 't', 't-l', 't-r', 'l', 'r']).optional(),
     }),
 });
 

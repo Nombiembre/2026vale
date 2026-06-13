@@ -11,6 +11,7 @@ const capsules = (await getCollection("diary"))
     id: item.id,
     date: item.data.date,
     cover: item.data.cover,
+    align: item.data.align,
   }))
   .sort((a, b) => {
     const da = a.date;

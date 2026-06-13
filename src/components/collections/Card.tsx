@@ -4,9 +4,22 @@ interface DiaryCardProps {
   date: any
   cover: string | undefined
   href: string
+  align?: 'center' | 'b' | 'b-l' | 'b-r' | 't' | 't-l' | 't-r' | 'l' | 'r'
 }
 
-const Card = ({ date, cover, href }: DiaryCardProps) => {
+const alignMap: Record<string, string> = {
+  'center': 'object-center',
+  'b':      'object-bottom',
+  'b-l':    'object-left-bottom',
+  'b-r':    'object-right-bottom',
+  't':      'object-top',
+  't-l':    'object-left-top',
+  't-r':    'object-right-top',
+  'l':      'object-left',
+  'r':      'object-right',
+}
+
+const Card = ({ date, cover, href, align = 'center'  }: DiaryCardProps) => {
   // const { id, data } = post;
   // const transitionName = `post-img-${id}`;
 
@@ -30,7 +43,9 @@ const Card = ({ date, cover, href }: DiaryCardProps) => {
           width={500}
           height={500}
           loading="lazy"
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 ${alignMap[align]}`}
+          srcSet={`${cover}?w=400 400w, ${cover}?w=600 600w`}
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
         /> : <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />}
 
 

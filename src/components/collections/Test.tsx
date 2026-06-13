@@ -5,6 +5,7 @@ interface DiaryPreview {
   id: string;
   date: Date;
   cover?: string;
+  align?: 'center' | 'b' | 'b-l' | 'b-r' | 't' | 't-l' | 't-r' | 'l' | 'r';
 }
 
 interface TestProps {
@@ -72,7 +73,7 @@ const Test: React.FC<TestProps> = ({ collection }) => {
                 <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                   {months.get(month)!.map((item) => (
                     <div key={item.id}>
-                      <Card date={item.date} cover={item.cover} href={`/diary/${item.id}`}/>
+                      <Card date={item.date} cover={item.cover} href={`/diary/${item.id}`} align={item.align} />
                     </div>
                   ))}
                 </div>
