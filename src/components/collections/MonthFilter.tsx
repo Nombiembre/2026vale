@@ -4,6 +4,7 @@ import { $yearStore, $monthStore } from '~/utils/filterStore'
 import type { monthType } from '~/utils/filterStore'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
+gsap.registerPlugin(useGSAP);
 
 interface MonthFilterProps {
   monthsByYear: Record<string, number[]>
