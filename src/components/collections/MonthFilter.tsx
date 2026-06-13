@@ -2,9 +2,6 @@ import React, { useEffect, useRef } from 'react'
 import { useStore } from '@nanostores/react'
 import { $yearStore, $monthStore } from '~/utils/filterStore'
 import type { monthType } from '~/utils/filterStore'
-const { gsap } = await import('gsap')
-import { useGSAP } from '@gsap/react'
-gsap.registerPlugin(useGSAP);
 
 interface MonthFilterProps {
   monthsByYear: Record<string, number[]>
@@ -71,21 +68,6 @@ const MonthFilter: React.FC<MonthFilterProps> = ({ monthsByYear }) => {
     if (buttons.length === 0) return
 
     prevYearRef.current = selectedYear
-  }, [selectedYear])
-
-  useGSAP(() => {
-    const container = containerRef.current
-    if (!container) return
-
-    const buttons = container.querySelectorAll('.month-button ')
-    gsap.to(buttons, {
-      opacity: 1,
-      x: 0,
-      duration: 0.25,
-      stagger: 0.3,
-      ease: 'power2.out',
-      clearProps: 'all',
-    })
   }, [selectedYear])
 
   return (
