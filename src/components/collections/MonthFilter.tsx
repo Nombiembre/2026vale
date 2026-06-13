@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react'
 import { useStore } from '@nanostores/react'
 import { $yearStore, $monthStore } from '~/utils/filterStore'
 import type { monthType } from '~/utils/filterStore'
-import gsap from 'gsap'
+import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
 gsap.registerPlugin(useGSAP);
 
