@@ -1,6 +1,5 @@
 ---
 date: 2025-02-27
-cover: "/images/diary/2025/febrero/27.avif"
 ---
 15:44 Ya llegue a la casa y tambien ya llegó el librooooo
 

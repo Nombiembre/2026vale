@@ -1,0 +1,120 @@
+---
+import displayDate from "~/utils/displayTime";
+
+type Align =
+  | "center"
+  | "b"
+  | "b-l"
+  | "b-r"
+  | "t"
+  | "t-l"
+  | "t-r"
+  | "l"
+  | "r";
+
+interface Props {
+  date: Date | string;
+  cover?: string;
+  href: string;
+  align?: Align;
+}
+
+const { date, cover, href, align = "center" } = Astro.props;
+
+const alignMap: Record<Align, string> = {
+  center: "object-center",
+  b: "object-bottom",
+  "b-l": "object-left-bottom",
+  "b-r": "object-right-bottom",
+  t: "object-top",
+  "t-l": "object-left-top",
+  "t-r": "object-right-top",
+  l: "object-left",
+  r: "object-right",
+};
+
+const d = new Date(date);
+
+const isSpecialDate =
+  (d.getUTCMonth() === 10 && d.getUTCDate() === 7) || // 7 noviembre
+  (d.getUTCMonth() === 9 && d.getUTCDate() === 22);
+
+const dateLabel = displayDate(d, {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+});
+---
+
+<a
+  href={href}
+  class="group block relative bg-muted/20 overflow-hidden border border-muted/30 hover:border-primary/50 transition-all duration-500 hover:-translate-y-1"
+>
+  <div class="relative aspect-square overflow-hidden">
+    {
+      cover ? (
+        <img
+          src={cover}
+          alt={`Portada del ${dateLabel}`}
+          width={500}
+          height={500}
+          loading="lazy"
+          decoding="async"
+          class:list={[
+            "w-full h-full object-cover transition-transform duration-700 group-hover:scale-105",
+            alignMap[align],
+          ]}
+        />
+      ) : (
+        <div aria-hidden="true" class="h-full w-full bg-muted/20" />
+      )
+    }
+
+    <div
+      class="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+    />
+  </div>
+
+  <div
+    class="relative px-6 py-3 bg-background/95 backdrop-blur-sm border-t border-muted/30"
+  >
+    <div class="flex items-center justify-between">
+      <div
+        class="text-3xl md:text-5xl font-light text-primary/80 group-hover:text-primary transition-colors duration-300"
+      >
+        {displayDate(date, { day: "numeric" })}
+      </div>
+
+      {
+        isSpecialDate && (
+          <div class="flex flex-col items-center justify-center">
+            <img
+              src="/favicon.svg"
+              alt=""
+              width="24"
+              height="24"
+              loading="lazy"
+              class="w-6 h-6 opacity-40 group-hover:opacity-70 transition-opacity duration-300"
+            />
+          </div>
+        )
+      }
+    </div>
+
+    <div
+      class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+    >
+    </div>
+  </div>
+
+  <svg
+    class="absolute top-2 right-2 w-6 h-6 text-primary/30 group-hover:text-primary/60 transition-colors duration-300"
+    viewBox="0 0 24 24"
+    fill="none"
+    aria-hidden="true"
+  >
+    <path
+      d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z"
+      fill="currentColor"></path>
+  </svg>
+</a>

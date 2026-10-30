@@ -1,6 +1,5 @@
 ---
 date: 2025-02-24
-cover: "/images/diary/2025/febrero/24.avif"
 ---
 15:10 hace rato queria comenzar a llenar lo de la actividad semanal y, fuck, me entro la mini ansiedad de que, LO QUE QUIERO ESCRIBIR NO CABE EN ESE RECTANGULO TAN PEQUEÑO, y lo queria hacer en la hoja y no virtual porque:
 1. Gastaste muchas hojas

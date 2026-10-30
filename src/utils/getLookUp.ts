@@ -1,51 +1,82 @@
 import { Resend } from "resend";
-import type { AstroGlobal } from "astro";
 import displayDate from "./displayTime";
 
+const env = (key: "RESEND_APIKEY" | "OWNIP"): string | undefined =>
+	process.env[key] || import.meta.env[key];
+
+/**
+ * Small, privacy-conscious "someone opened the site" notifier.
+ *
+ * It runs from the on-demand `/api/visit` endpoint, which the layout pings once
+ * per page load. The site itself stays static and a failure here can never
+ * break the page.
+ */
+export interface LookUpContext {
+	request: Request;
+	url: URL;
+}
+
 const getClientIp = (request: Request): string | null => {
-  const forwarded = request.headers.get("x-forwarded-for");
-  return forwarded
-    ? forwarded.split(",")[0]
-    : request.headers.get("cf-connecting-ip") ||
-        request.headers.get("x-real-ip") ||
-        null;
+	const forwarded = request.headers.get("x-forwarded-for");
+	return (
+		forwarded?.split(",")[0]?.trim() ||
+		request.headers.get("cf-connecting-ip") ||
+		request.headers.get("x-real-ip") ||
+		null
+	);
 };
 
-const getLookUp = async (Astro: AstroGlobal) => {
-  const clientIp = getClientIp(Astro.request) as string;
-  const userAgent = Astro.request.headers.get("user-agent");
-  const pathname = Astro.url.pathname;
-  const date = displayDate(
-    new Date(),
-    {
-      day: "2-digit",
-      month: "long",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: true,
-    },
-    "America/Bogota"
-  );
+const escapeHtml = (value: string): string =>
+	value
+		.replaceAll("&", "&amp;")
+		.replaceAll("<", "&lt;")
+		.replaceAll(">", "&gt;")
+		.replaceAll('"', "&quot;")
+		.replaceAll("'", "&#39;");
 
+const getLookUp = async ({ request, url }: LookUpContext): Promise<void> => {
+	try {
+		const apiKey = env("RESEND_APIKEY");
+		if (!apiKey) return;
 
-  const localip = import.meta.env.OWNIP;
+		const clientIp = getClientIp(request);
+		if (!clientIp) return;
 
-  if (clientIp !== null && clientIp !== localip) {
-    const resend = new Resend(import.meta.env.RESEND_APIKEY);
-    await resend.emails.send({
-      from: "ip@nombiembre.dev",
-      to: "etoro@unicoc.edu.co",
-      subject: "New Ip address",
-      html: `
-      <p>Ip: ${clientIp}</p>
-      <p>Pathname: ${pathname}</p>
-      <p>Date: ${date}</p>
-      <p>User Agent: ${userAgent}</p>
+		// Requests made by the author are not reported.
+		if (clientIp === env("OWNIP")) return;
+
+		const userAgent = request.headers.get("user-agent") ?? "desconocido";
+		const pathname = url.pathname;
+		const date = displayDate(
+			new Date(),
+			{
+				day: "2-digit",
+				month: "long",
+				hour: "2-digit",
+				minute: "2-digit",
+				second: "2-digit",
+				hour12: true,
+			},
+			"America/Bogota",
+		);
+
+		const resend = new Resend(apiKey);
+		await resend.emails.send({
+			from: "ip@nombiembre.dev",
+			to: "etoro@unicoc.edu.co",
+			subject: "New Ip address",
+			html: `
+      <p>Ip: ${escapeHtml(clientIp)}</p>
+      <p>Pathname: ${escapeHtml(pathname)}</p>
+      <p>Date: ${escapeHtml(date)}</p>
+      <p>User Agent: ${escapeHtml(userAgent)}</p>
       `,
-      text: `Ip: ${clientIp}`,
-    });
-  }
+			text: `Ip: ${clientIp}`,
+		});
+	} catch (error) {
+		// Never let the notifier take down a page.
+		console.error("[getLookUp]", error);
+	}
 };
 
 export default getLookUp;

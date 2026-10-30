@@ -19,6 +19,7 @@ const observatory = defineCollection({
         title: z.string(),
         date: z.date(),
         cover: z.string().optional(),
+        heroImage: z.string().optional(),
     }),
 });
 

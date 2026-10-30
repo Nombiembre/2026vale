@@ -9,7 +9,8 @@ import mdx from '@astrojs/mdx';
 // https://astro.build/config
 export default defineConfig({
   adapter: vercel(),
-  output: 'server',
+  // Everything is prerendered at build time except /api/visit.
+  output: 'static',
   vite: {
     plugins: [tailwindcss()]
   },

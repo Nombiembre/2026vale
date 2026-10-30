@@ -1,9 +1,8 @@
 ---
 import { getCollection } from "astro:content";
+import Card from "~/components/collections/Card.astro";
 import Layout from "~/layouts/Layout.astro";
-import DiaryRender from "~/components/collections/DiaryRender";
-import YearFilter from "~/components/collections/YearFilter.astro";
-import MonthFilter from "~/components/collections/MonthFilter";
+import { monthName, monthSlug } from "~/utils/months";
 
 const capsules = (await getCollection("diary"))
   .filter(({ id }) => !id.includes("nancy"))
@@ -16,40 +15,259 @@ const capsules = (await getCollection("diary"))
   .sort((a, b) => {
     const da = a.date;
     const db = b.date;
-    if (da.getUTCFullYear() !== db.getUTCFullYear()) return db.getUTCFullYear() - da.getUTCFullYear();
-    if (da.getUTCMonth() !== db.getUTCMonth()) return db.getUTCMonth() - da.getUTCMonth();
+    if (da.getUTCFullYear() !== db.getUTCFullYear())
+      return db.getUTCFullYear() - da.getUTCFullYear();
+    if (da.getUTCMonth() !== db.getUTCMonth())
+      return db.getUTCMonth() - da.getUTCMonth();
     return da.getUTCDate() - db.getUTCDate();
   });
 
-// Calcular años y meses disponibles
-const yearSet = new Set<string>();
-const monthsByYear: Record<string, number[]> = {};
+// Agrupar por año y mes una sola vez, en el build.
+const postsByYear = new Map<string, Map<number, typeof capsules>>();
 
-for (const item of capsules) {
-  const year = String(item.date.getUTCFullYear());
-  const month = item.date.getUTCMonth();
-  yearSet.add(year);
-  if (!monthsByYear[year]) monthsByYear[year] = [];
-  if (!monthsByYear[year].includes(month)) monthsByYear[year].push(month);
+for (const post of capsules) {
+  const year = String(post.date.getUTCFullYear());
+  const month = post.date.getUTCMonth();
+
+  if (!postsByYear.has(year)) postsByYear.set(year, new Map());
+  const months = postsByYear.get(year)!;
+  if (!months.has(month)) months.set(month, []);
+  months.get(month)!.push(post);
 }
 
-// Ordenar meses de cada año descendente
-for (const year in monthsByYear) {
-  monthsByYear[year].sort((a, b) => a - b);
-}
-
-const years = ["all", ...Array.from(yearSet).sort((a, b) => Number(a) - Number(b))];
+const years = [...postsByYear.keys()].sort((a, b) => Number(b) - Number(a));
 ---
 
 <Layout
-  title="Capsules of Echoes"
+  title="From A Distance"
   subtitle="Una crónica de momentos preservados en el tiempo. Cada dia, una flor olvidada entre las páginas de la memoria."
 >
   <div class="space-y-6">
-    <div class="flex-col  md:items-center flex-wrap gap-y-3 gap-6 items-center flex">
-       <YearFilter years={years} />
-       <MonthFilter monthsByYear={monthsByYear} client:load />
+    <div
+      class="flex-col md:items-center flex-wrap gap-y-3 gap-6 items-center flex"
+    >
+      <div class="flex gap-6 items-center">
+        <span class="text-base text-ink-muted font-medium uppercase">Year</span>
+        <span class="text-accent-gold" aria-hidden="true">✦</span>
+        <div
+          id="yearFilter"
+          class="flex flex-wrap"
+          role="group"
+          aria-label="Filtrar por año"
+        >
+          <button
+            type="button"
+            data-year="all"
+            class="button-filter selectedfilter"
+            aria-pressed="true">All</button
+          >
+          {
+            years.map((year) => (
+              <button
+                type="button"
+                data-year={year}
+                class="button-filter"
+                aria-pressed="false"
+              >
+                {year}
+              </button>
+            ))
+          }
+        </div>
+      </div>
+
+      <div
+        id="monthFilter"
+        class="flex flex-col md:flex-row flex-wrap gap-3 md:gap-6 md:w-full"
+        role="group"
+        aria-label="Filtrar por mes"
+        hidden
+      >
+        {
+          years.map((year) => (
+            <div class="flex flex-wrap gap-y-2" data-month-buttons={year} hidden>
+              {[...postsByYear.get(year)!.keys()]
+                .sort((a, b) => a - b)
+                .map((monthIndex) => (
+                  <button
+                    type="button"
+                    data-month={monthSlug(monthIndex)}
+                    class="button-filter"
+                    aria-pressed="false"
+                  >
+                    {monthName(monthIndex)}
+                  </button>
+                ))}
+            </div>
+          ))
+        }
+      </div>
     </div>
-    <DiaryRender collection={capsules} client:load />
+
+    <div id="diaryContent" class="space-y-12">
+      {
+        years.map((year) => (
+          <section data-year={year}>
+            <div class="text-center mb-16">
+              <h2 class="text-4xl md:text-5xl font-light text-foreground mb-2">
+                {year}
+              </h2>
+              <div class="flex justify-center">
+                <div class="w-48 h-px bg-linear-to-r from-transparent via-primary/40 to-transparent" />
+              </div>
+            </div>
+
+            {[...postsByYear.get(year)!.entries()]
+              .sort(([a], [b]) => b - a)
+              .map(([monthIndex, posts]) => (
+                <div data-month={monthSlug(monthIndex)} class="mb-10">
+                  <h3 class="mb-6 text-3xl font-medium text-muted">
+                    {monthName(monthIndex)}
+                  </h3>
+                  <div class="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                    {posts.map((post) => (
+                      <Card
+                        date={post.date}
+                        cover={post.cover}
+                        href={`/diary/${post.id}`}
+                        align={post.align}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ))}
+          </section>
+        ))
+      }
+    </div>
   </div>
 </Layout>
+
+<script>
+  const yearButtons = Array.from(
+    document.querySelectorAll<HTMLButtonElement>("#yearFilter button"),
+  );
+  const monthButtons = Array.from(
+    document.querySelectorAll<HTMLButtonElement>("#monthFilter button"),
+  );
+  const monthFilter = document.querySelector<HTMLElement>("#monthFilter");
+  const monthButtonGroups = Array.from(
+    document.querySelectorAll<HTMLElement>("[data-month-buttons]"),
+  );
+  const yearSections = Array.from(
+    document.querySelectorAll<HTMLElement>("#diaryContent section[data-year]"),
+  );
+  const monthSections = Array.from(
+    document.querySelectorAll<HTMLElement>("#diaryContent [data-month]"),
+  );
+
+  const validYears = new Set(yearButtons.map((button) => button.dataset.year));
+  const monthsByYear = new Map<string, Set<string>>();
+
+  for (const group of monthButtonGroups) {
+    const year = group.dataset.monthButtons;
+    if (!year) continue;
+
+    monthsByYear.set(
+      year,
+      new Set(
+        Array.from(group.querySelectorAll<HTMLButtonElement>("button")).map(
+          (button) => button.dataset.month ?? "",
+        ),
+      ),
+    );
+  }
+
+  interface FilterState {
+    year: string;
+    month: string;
+  }
+
+  const readUrl = (): FilterState => {
+    const params = new URL(window.location.href).searchParams;
+    const yearParam = params.get("year");
+    const year =
+      yearParam && yearParam !== "all" && validYears.has(yearParam)
+        ? yearParam
+        : "all";
+    const monthParam = params.get("month");
+    const month =
+      year !== "all" &&
+      monthParam &&
+      monthsByYear.get(year)?.has(monthParam)
+        ? monthParam
+        : "all";
+
+    return { year, month };
+  };
+
+  let state = readUrl();
+
+  const apply = ({ year, month }: FilterState) => {
+    for (const button of yearButtons) {
+      const active = (button.dataset.year ?? "all") === year;
+      button.classList.toggle("selectedfilter", active);
+      button.setAttribute("aria-pressed", String(active));
+    }
+
+    if (monthFilter) monthFilter.hidden = year === "all";
+
+    for (const group of monthButtonGroups) {
+      group.hidden = group.dataset.monthButtons !== year;
+    }
+
+    for (const button of monthButtons) {
+      const active = month !== "all" && button.dataset.month === month;
+      button.classList.toggle("selectedfilter", active);
+      button.setAttribute("aria-pressed", String(active));
+    }
+
+    for (const section of yearSections) {
+      section.hidden = year !== "all" && section.dataset.year !== year;
+    }
+
+    for (const section of monthSections) {
+      section.hidden =
+        year !== "all" && month !== "all" && section.dataset.month !== month;
+    }
+  };
+
+  const updateUrl = () => {
+    const url = new URL(window.location.href);
+
+    if (state.year === "all") url.searchParams.delete("year");
+    else url.searchParams.set("year", state.year);
+
+    if (state.month === "all") url.searchParams.delete("month");
+    else url.searchParams.set("month", state.month);
+
+    window.history.pushState({}, "", url);
+  };
+
+  for (const button of yearButtons) {
+    button.addEventListener("click", () => {
+      state = { year: button.dataset.year ?? "all", month: "all" };
+      apply(state);
+      updateUrl();
+    });
+  }
+
+  for (const button of monthButtons) {
+    button.addEventListener("click", () => {
+      const month = button.dataset.month;
+      state = {
+        year: state.year,
+        month: state.month === month ? "all" : (month ?? "all"),
+      };
+      apply(state);
+      updateUrl();
+    });
+  }
+
+  window.addEventListener("popstate", () => {
+    state = readUrl();
+    apply(state);
+  });
+
+  apply(state);
+</script>

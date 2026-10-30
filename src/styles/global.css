@@ -1,6 +1,14 @@
 @import "tailwindcss";
 @plugin '@tailwindcss/typography';
 
+
+@view-transition {
+  navigation: auto;
+}
+
+html {
+  scrollbar-gutter: stable;
+}
 /* =========================
    ROOT – PALETTE & TOKENS
    ========================= */
@@ -35,19 +43,21 @@
 
 @theme {
   --color-background: var(--paper);
+  --color-paper: var(--paper);
+  --color-paper-soft: var(--paper-soft);
+  --color-foreground: var(--ink);
   --color-primary: var(--primary);
+  --color-primary-light: color-mix(in oklab, var(--primary) 70%, var(--paper));
   --color-primary-bg: color-mix(in oklab, var(--color-primary) 10%, transparent);
   --color-accent-gold: var(--accent-gold);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
 
-  
   --color-border: var(--border);
   --color-ink: var(--ink);
   --color-ink-muted: var(--ink-muted);
-  
+
   --color-prose: color-mix(in oklab, var(--ink) 90%, transparent);
-      
 }
 
 
@@ -60,6 +70,10 @@
 
   a {
     text-decoration: none;
+  }
+
+  [hidden] {
+    display: none !important;
   }
 
   img {

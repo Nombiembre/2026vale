@@ -1,19 +1,20 @@
 ---
-// Streamtape.astro (Google Drive - ultra simple)
-// Props:
-// - src: string (URL de Google Drive en formato /preview)
+// Google Drive video embed (URL en formato /preview)
 
 interface Props {
   src: string;
+  title?: string;
 }
 
-const { src } = Astro.props as Props;
+const { src, title = "Video" } = Astro.props as Props;
 ---
 
 <div class="video-wrapper">
   <iframe
     src={src}
+    title={title}
     allow="autoplay; fullscreen"
+    loading="lazy"
     frameborder="0"
   ></iframe>
 </div>

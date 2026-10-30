@@ -1,0 +1,18 @@
+---
+import Layout from "~/layouts/Layout.astro";
+
+Astro.response.status = 404;
+---
+
+<Layout title="Página no encontrada">
+  <div class="text-center space-y-6">
+    <p class="text-lg md:text-xl">
+      La página que buscas no existe o la cápsula todavía no ha sido escrita.
+    </p>
+    <p>
+      <a href="/diary" class="text-primary underline underline-offset-4">
+        Volver al diario
+      </a>
+    </p>
+  </div>
+</Layout>

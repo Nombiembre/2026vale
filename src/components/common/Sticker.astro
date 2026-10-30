@@ -4,7 +4,13 @@ interface Props {
 }
 
 const { sticker } = Astro.props;
-const src = `/public/images/diary/generic/stickers/${sticker}.avif`;
+const src = `/images/diary/generic/stickers/${sticker}.avif`;
 ---
 
-<img src={src} alt="Sticker" class="not-prose w-full h-full object-cover rounded-none max-w-1/4 text-left" />
+<img
+  src={src}
+  alt={`Sticker ${sticker}`}
+  loading="lazy"
+  decoding="async"
+  class="not-prose w-full h-auto object-contain max-w-56"
+/>

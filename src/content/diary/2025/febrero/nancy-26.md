@@ -1,6 +1,5 @@
 ---
 date: 2025-02-26
-cover: "/images/diary/2025/febrero/26.avif"
 ---
 (Lo que ella me dijo en la mañana)
 > le odio tanto a mi mamá últimamente\

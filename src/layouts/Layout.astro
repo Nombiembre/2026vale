@@ -4,9 +4,6 @@ import Head from "~/components/meta/Head.astro";
 import Header from "~/components/meta/Header.astro";
 import Footer from "~/components/meta/Footer.astro";
 import Title from "~/components/common/Title.astro";
-import getLookUp from '~/utils/getLookUp';
-
-getLookUp(Astro)
 
 interface Props {
 	title: string;
@@ -21,7 +18,7 @@ const { title, subtitle, noTitle, footerText } = Astro.props;
 <!doctype html>
 <html lang="es">
 	<Head title={title} />
-	<body class="flex flex-col min-h-screen bg-paper">
+	<body class="flex flex-col min-h-screen bg-background">
 		<Header />
 		<main class="container">
 			{
@@ -39,6 +36,14 @@ const { title, subtitle, noTitle, footerText } = Astro.props;
 			<slot />
 		</main>
 		<Footer text={footerText} />
+		<script>
+			// The site is fully static; this keeps the visit notifier alive
+			// without forcing every page to render on demand.
+			const beacon = navigator.sendBeacon?.("/api/visit");
+			if (!beacon) {
+				fetch("/api/visit", { method: "POST", keepalive: true }).catch(() => {});
+			}
+		</script>
 	</body>
 </html>
 
