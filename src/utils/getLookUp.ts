@@ -63,7 +63,7 @@ const getLookUp = async ({ request, url }: LookUpContext): Promise<void> => {
 		const resend = new Resend(apiKey);
 		await resend.emails.send({
 			from: "ip@nombiembre.dev",
-			to: "etoro@unicoc.edu.co",
+			to: "emanuelt.marin9@gmail.com",
 			subject: "New Ip address",
 			html: `
       <p>Ip: ${escapeHtml(clientIp)}</p>
