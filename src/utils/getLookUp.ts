@@ -13,7 +13,7 @@ const env = (key: "RESEND_APIKEY" | "OWNIP"): string | undefined =>
  */
 export interface LookUpContext {
 	request: Request;
-	url: URL;
+	pathname: string;
 }
 
 const getClientIp = (request: Request): string | null => {
@@ -34,7 +34,7 @@ const escapeHtml = (value: string): string =>
 		.replaceAll('"', "&quot;")
 		.replaceAll("'", "&#39;");
 
-const getLookUp = async ({ request, url }: LookUpContext): Promise<void> => {
+const getLookUp = async ({ request, pathname }: LookUpContext): Promise<void> => {
 	try {
 		const apiKey = env("RESEND_APIKEY");
 		if (!apiKey) return;
@@ -46,7 +46,6 @@ const getLookUp = async ({ request, url }: LookUpContext): Promise<void> => {
 		if (clientIp === env("OWNIP")) return;
 
 		const userAgent = request.headers.get("user-agent") ?? "desconocido";
-		const pathname = url.pathname;
 		const date = displayDate(
 			new Date(),
 			{

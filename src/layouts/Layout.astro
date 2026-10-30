@@ -38,10 +38,17 @@ const { title, subtitle, noTitle, footerText } = Astro.props;
 		<Footer text={footerText} />
 		<script>
 			// The site is fully static; this keeps the visit notifier alive
-			// without forcing every page to render on demand.
-			const beacon = navigator.sendBeacon?.("/api/visit");
-			if (!beacon) {
-				fetch("/api/visit", { method: "POST", keepalive: true }).catch(() => {});
+			// without forcing every page to render on demand. Send the page path
+			// in the body so the endpoint knows where the visit happened.
+			const pathname = window.location.pathname;
+			const sent = navigator.sendBeacon?.("/api/visit", pathname);
+			if (!sent) {
+				fetch("/api/visit", {
+					method: "POST",
+					body: pathname,
+					headers: { "Content-Type": "text/plain;charset=UTF-8" },
+					keepalive: true,
+				}).catch(() => {});
 			}
 		</script>
 	</body>
