@@ -82,7 +82,7 @@ const dateLabel = displayDate(d, {
       <div
         class="text-3xl md:text-5xl font-light text-primary/80 group-hover:text-primary transition-colors duration-300"
       >
-        {displayDate(date, { day: "numeric" })}
+        {displayDate(d, { day: "numeric" })}
       </div>
 
       {
@@ -107,14 +107,4 @@ const dateLabel = displayDate(d, {
     </div>
   </div>
 
-  <svg
-    class="absolute top-2 right-2 w-6 h-6 text-primary/30 group-hover:text-primary/60 transition-colors duration-300"
-    viewBox="0 0 24 24"
-    fill="none"
-    aria-hidden="true"
-  >
-    <path
-      d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z"
-      fill="currentColor"></path>
-  </svg>
 </a>
